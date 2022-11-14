@@ -18,6 +18,15 @@ def index(request):
     read = Read.objects.filter(user_refer=request.user)
     recently_read = read.order_by('-book_read_latest_time')[:8]
     if request.method == "GET":
+        search_query = request.GET.get('query')
+        if search_query:
+            SearchCheck = Book.objects.filter(book_name__contains=search_query)
+            if SearchCheck:
+                book = Book.objects.all().filter(book_name__startswith=search_query)
+                topics = {
+                    'search':book,
+                }
+                return render(request, 'homepage/homepage.html', {'topics':topics})
         return render(request, 'homepage/homepage.html',
             {'is_user_authenticated': request.user.is_authenticated,
             'user': request.user, #'books': latest_book,
